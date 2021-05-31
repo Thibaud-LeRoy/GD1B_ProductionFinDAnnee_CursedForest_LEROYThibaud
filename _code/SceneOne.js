@@ -38,11 +38,11 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //----------------------------------------   BACKGROUND   ---------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        this.load.image('fond', 'assets/fond.png');
-        this.load.image('second_Plan', 'assets/second_plan.png');
-        this.load.image('premier_Plan', 'assets/premier_plan.png');
-        this.load.image('water', 'assets/water.png');
-        this.load.image('cacheParallaxe', 'assets/cache_parallaxe.png');
+        this.load.image('fond', '../_assets/_export/_decors/_level1/fond.png');
+        this.load.image('second_Plan', '../_assets/_export/_decors/_level1/second_plan.png');
+        this.load.image('premier_Plan', '../_assets/_export/_decors/_level1/premier_plan.png');
+        this.load.image('water', '../_assets/_export/_decors/_level1/water.png');
+        this.load.image('cacheParallaxe', '../_assets/_export/_decors/_level1/cache_parallaxe.png');
         
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
