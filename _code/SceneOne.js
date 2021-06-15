@@ -56,6 +56,13 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         this.load.image('player', 'assets/player_placeholdere.png');
         
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //-----------------------------------------   TILESET   -----------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this.load.image('tuile_niveau1', '../_assets/_export/_tileset/sprite_props.png');
+        this.load.tilemapTiledJSON('map_level1', '_levels/map_level1.json');
+        
     }
     
     
@@ -139,6 +146,25 @@ class SceneOne extends Phaser.Scene{
         
     
     //var crapaudPartition = this.input.keyboard.createCombo(['AABXXB'],{resetOnWrongKey:true});
+        
+        
+        
+        ///////////////////////////////////////////////////////////
+        ////////////////////////  TILED  //////////////////////////
+        ///////////////////////////////////////////////////////////
+        
+        const map = this.make.tilemap({
+            key : 'map_level1'
+        });
+        const tileset = map.addTilesetImage('sprite_props','tuile_niveau1');
+        const plantes = map.createLayer('plantes',tileset,0,0);
+        
+        const plateforme_collide = map.createLayer('plateforme_collide',tileset,0,0);
+        plateforme_collide.setCollisionByExclusion(-1,true);
+        this.physics.add.collider(player,plateforme_collide);
+        
+        const plateforme_traverse = map.createLayer('plateforme_traverse',tileset,0,0);
+       
        
 }
         
