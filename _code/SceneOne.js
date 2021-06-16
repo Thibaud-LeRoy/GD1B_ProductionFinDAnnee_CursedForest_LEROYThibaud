@@ -74,16 +74,16 @@ class SceneOne extends Phaser.Scene{
     
     create(){
         
-        this.cameras.main.setBounds(0, 0, 10000, 720);
-        this.physics.world.setBounds(0, 0, 10000, 720);
+        this.cameras.main.setBounds(0, 0, 4480, 1216);
+        this.physics.world.setBounds(0, 0, 4480, 1216);
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //----------------------------------------   BACKGROUND   ---------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        fond = this.add.image(5000, 360, 'fond').setScrollFactor(0.5);
-        secondPlan = this.add.image(5000, 360, 'second_Plan').setScrollFactor(0.75);
-        premierPlan = this.add.image(5000, 360, 'premier_Plan').setScrollFactor(0.78);
-        water = this.add.image(5000,675,'water').setScrollFactor(1);
+        //fond = this.add.image(5000, 360, 'fond').setScrollFactor(0.5);
+        //secondPlan = this.add.image(5000, 360, 'second_Plan').setScrollFactor(0.75);
+        //premierPlan = this.add.image(5000, 360, 'premier_Plan').setScrollFactor(0.78);
+        //water = this.add.image(5000,675,'water').setScrollFactor(1);
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-------------------------------------------   PERSO   -----------------------------------------------//
@@ -95,8 +95,8 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //----------------------------------------   PARALLAXE   ----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        parallaxe = this.add.image(5000,360,'cacheParallaxe').setScrollFactor(2);
-        parallaxe = this.add.image(14500,360,'cacheParallaxe').setScrollFactor(2);
+        //parallaxe = this.add.image(5000,360,'cacheParallaxe').setScrollFactor(2);
+        //parallaxe = this.add.image(14500,360,'cacheParallaxe').setScrollFactor(2);
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //--------------------------------------------   UI   -------------------------------------------------//
@@ -164,6 +164,7 @@ class SceneOne extends Phaser.Scene{
         this.physics.add.collider(player,plateforme_collide);
         
         const plateforme_traverse = map.createLayer('plateforme_traverse',tileset,0,0);
+        
        
        
 }
