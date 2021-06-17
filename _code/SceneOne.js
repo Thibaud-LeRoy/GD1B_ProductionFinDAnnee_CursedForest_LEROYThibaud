@@ -1,10 +1,20 @@
 var player;
+var pv = 3;
+var PDV1;
+var PDV2;
+var PDV3;
+var PV_vide;
+var invincible = false;
+
 
 var keys;
+var un_left;
+var un_right;
 var gamepad;
 var paddle;
 var padConnected;
 var pad;
+
 
 var fond;
 var partition;
@@ -12,6 +22,12 @@ var secondPlan;
 var premierPlan;
 var water;
 var parallaxe;
+
+
+var crapaud;
+var plante_boule;
+var plante_rayon;
+
 
 var crapaudPartition = false;
 var renardPartition = false;
@@ -39,22 +55,39 @@ class SceneOne extends Phaser.Scene{
         //----------------------------------------   BACKGROUND   ---------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         this.load.image('fond', '../_assets/_export/_decors/_level1/fond.png');
-        this.load.image('second_Plan', '../_assets/_export/_decors/_level1/second_plan.png');
+        /*this.load.image('second_Plan', '../_assets/_export/_decors/_level1/second_plan.png');
         this.load.image('premier_Plan', '../_assets/_export/_decors/_level1/premier_plan.png');
         this.load.image('water', '../_assets/_export/_decors/_level1/water.png');
-        this.load.image('cacheParallaxe', '../_assets/_export/_decors/_level1/cache_parallaxe.png');
+        this.load.image('cacheParallaxe', '../_assets/_export/_decors/_level1/cache_parallaxe.png');*/
         
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //--------------------------------------------   UI   -------------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        this.load.image('partition','assets/partition.png');
-        
+        //this.load.image('partition','assets/partition.png');
+        this.load.image('PV','../_assets/_export/_interface/PV.png');
+        this.load.image('PV_vide','../_assets/_export/_interface/PV_vide.png');
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-------------------------------------------   PERSO   -----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        this.load.image('player', 'assets/player_placeholdere.png');
+        //this.load.image('player', 'assets/player_placeholdere.png');
+        
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //-----------------------------------------   ENNEMIES   ----------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this.load.spritesheet('plante_boule', '../_assets/_export/_ennemies/spritesheet_planteBoule.png',{ frameWidth: 194, frameHeight: 220 })
+        this.load.spritesheet('plante_rayon', '../_assets/_export/_ennemies/spritesheet_planteRayon.png',{ frameWidth: 209, frameHeight: 133 })
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //-----------------------------------------   ANIMAUX   -----------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        this.load.spritesheet('crapaud', '../_assets/_export/_crapaud/crapaud_spritesheet.png',{ frameWidth: 199, frameHeight: 158 })
+        this.load.spritesheet('chouette', '../_assets/_export/_chouette/chouette_spritesheet.png',{ frameWidth: 172, frameHeight: 163 })
+        this.load.spritesheet('renard', '../_assets/_export/_renard/renard_spritesheet.png',{ frameWidth: 196, frameHeight: 221 })
+        this.load.spritesheet('cerf', '../_assets/_export/_cerf/cerf_spritesheet.png',{ frameWidth: 301, frameHeight: 319 })
         
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,21 +108,51 @@ class SceneOne extends Phaser.Scene{
     create(){
         
         this.cameras.main.setBounds(0, 0, 4480, 1216);
+        this.cameras.main.fadeIn(3000);
+        this.cameras.main.zoom = 0.4;
         this.physics.world.setBounds(0, 0, 4480, 1216);
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //----------------------------------------   BACKGROUND   ---------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //fond = this.add.image(5000, 360, 'fond').setScrollFactor(0.5);
-        //secondPlan = this.add.image(5000, 360, 'second_Plan').setScrollFactor(0.75);
-        //premierPlan = this.add.image(5000, 360, 'premier_Plan').setScrollFactor(0.78);
-        //water = this.add.image(5000,675,'water').setScrollFactor(1);
+        fond = this.add.image(600, 150, 'fond').setScrollFactor(0.5);
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //-------------------------------------------   PERSO   -----------------------------------------------//
+        //-------------------------------------------   PERSOS   -----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        player = this.physics.add.sprite(150, 550, 'player').setScale(0.35);
+        player = this.physics.add.sprite(150, 550, 'player').setScale(1);
         player.setCollideWorldBounds(true);
+        
+       
+        
+        
+        crapaud = this.add.sprite(4200,1070,'crapaud');
+        crapaud.flipX = true;
+        this.anims.create({
+            key : 'crapaudAnim',
+            frames: this.anims.generateFrameNumbers('crapaud',{start :0 , end:59}),
+            frameRate: 30,
+            repeat : -1
+        });
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //-----------------------------------------   ENNEMIES   ----------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        plante_boule = this.add.sprite(1830,200,'plante_boule');
+        this.anims.create({
+            key : 'plante_boule_anim',
+            frames: this.anims.generateFrameNumbers('plante_boule',{start :0 , end:49}),
+            frameRate: 25,
+            repeat : -1
+        });
+        
+        plante_rayon = this.add.sprite(3150,600,'plante_rayon').setRotation(-80);
+        this.anims.create({
+            key : 'plante_rayon_anim',
+            frames: this.anims.generateFrameNumbers('plante_rayon',{start :0 , end:44}),
+            frameRate: 23,
+            repeat : -1
+        });
         
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,12 +161,35 @@ class SceneOne extends Phaser.Scene{
         //parallaxe = this.add.image(5000,360,'cacheParallaxe').setScrollFactor(2);
         //parallaxe = this.add.image(14500,360,'cacheParallaxe').setScrollFactor(2);
         
+        ///////////////////////////////////////////////////////////
+        ////////////////////////  TILED  //////////////////////////
+        ///////////////////////////////////////////////////////////
+        
+        const map = this.make.tilemap({
+            key : 'map_level1'
+        });
+        const tileset = map.addTilesetImage('sprite_props','tuile_niveau1');
+        const plantes = map.createLayer('plantes',tileset,0,0);
+        
+        const plateforme_collide = map.createLayer('plateforme_collide',tileset,0,0);
+        plateforme_collide.setCollisionByExclusion(-1,true);
+        this.physics.add.collider(player,plateforme_collide);
+        
+        const plateforme_traverse = map.createLayer('plateforme_traverse',tileset,0,0);
+        
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //--------------------------------------------   UI   -------------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //partition = this.add.image(690,600,'partition');
         this.cameras.main.startFollow(player, true);
         
+        PV_vide = this.add.image(-500,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
+        PV_vide = this.add.image(-350,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
+        PV_vide = this.add.image(-200,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
+        
+        PDV1 = this.add.image(-500,-200,'PV').setScrollFactor(0).setScale(1.5);
+        PDV2 = this.add.image(-350,-200,'PV').setScrollFactor(0).setScale(1.5);
+        PDV3 = this.add.image(-200,-200,'PV').setScrollFactor(0).setScale(1.5);
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //----------------------------------------   CONTROLES   ----------------------------------------------//
@@ -124,49 +210,12 @@ class SceneOne extends Phaser.Scene{
             A: Phaser.Input.Keyboard.KeyCodes.A,
             B: Phaser.Input.Keyboard.KeyCodes.B,
             X: Phaser.Input.Keyboard.KeyCodes.X,
-            Y: Phaser.Input.Keyboard.KeyCodes.Y
+            Y: Phaser.Input.Keyboard.KeyCodes.Y,
         });
         
-        //MANETTE
-        if (this.input.gamepad.total === 0){
-            this.input.gamepad.once('connected', function (pad, button, index) {
-                paddle = pad;
-                padConnected = true;
-            }); 
-        }
-        else {
-            paddle = this.input.gamepad.pad1;
-        }
-        
-        //colliders & overlaps
-        //this.physics.add.collider(player, projectile, hitOnPlayer, null, this);
-        //this.physics.add.overlap(swing, projectile, renvoiProjectile, null, this);
-        
-        //keys = this.input.keyboard.createCursorKeys();
-        
-    
-    //var crapaudPartition = this.input.keyboard.createCombo(['AABXXB'],{resetOnWrongKey:true});
-        
-        
-        
-        ///////////////////////////////////////////////////////////
-        ////////////////////////  TILED  //////////////////////////
-        ///////////////////////////////////////////////////////////
-        
-        const map = this.make.tilemap({
-            key : 'map_level1'
-        });
-        const tileset = map.addTilesetImage('sprite_props','tuile_niveau1');
-        const plantes = map.createLayer('plantes',tileset,0,0);
-        
-        const plateforme_collide = map.createLayer('plateforme_collide',tileset,0,0);
-        plateforme_collide.setCollisionByExclusion(-1,true);
-        this.physics.add.collider(player,plateforme_collide);
-        
-        const plateforme_traverse = map.createLayer('plateforme_traverse',tileset,0,0);
-        
-       
-       
+        un_left = this.input.keyboard.addKey(Phaser.Input.Keyboard.LEFT);
+        un_right = this.input.keyboard.addKey(Phaser.Input.Keyboard.RIGHT);
+             
 }
         
     
@@ -177,6 +226,10 @@ class SceneOne extends Phaser.Scene{
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     update(){ 
+        
+        crapaud.anims.play('crapaudAnim',true);
+        plante_boule.anims.play('plante_boule_anim',true);
+        plante_rayon.anims.play('plante_rayon_anim',true);
         
       if(crapaudPartition == false && keys.A.isDown && renardPartition == false && chouettePartition == false && cerfPartition ==false){
             crapaudPartition = true;

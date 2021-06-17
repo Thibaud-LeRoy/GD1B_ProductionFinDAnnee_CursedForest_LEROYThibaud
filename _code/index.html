@@ -2,9 +2,10 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>Placeholder</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <title>Cursed Forest</title>
+    <script src="phaser.js"></script>
     <script src="SceneOne.js"></script>
+    <script src="ecranTitre.js"></script>
     <script src="Flute.js"></script>
     <style type="text/css">
         body {
@@ -19,8 +20,8 @@
 var config = {
     type: Phaser.AUTO,
     parent: "game",
-    width: 1280,
-    height: 720,
+    width: 896,
+    height: 448,
     input: {
         gamepad : true
     },
@@ -32,7 +33,7 @@ var config = {
             gravity: { y: 3000 }
         }
     },
-    scene: [SceneOne,Flute]
+    scene: [EcranTitre,SceneOne,Flute]
 };
 
 var game = new Phaser.Game(config);
