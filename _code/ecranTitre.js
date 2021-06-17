@@ -24,7 +24,7 @@ class EcranTitre extends Phaser.Scene{
     }
     create(){
         this.cameras.main.zoom = 0.5;
-        var fond = this.add.image(690,360,'ecran_titre').setScale(2);
+        var fond = this.add.image(400,300,'ecran_titre').setScale(1.5);
         var boutonJouerSel = this.add.image(400,430,'jouer_select').setInteractive();
         var boutonQuitterSel = this.add.image(400,540,'quitter_select').setInteractive();
         var boutonJouer = this.add.image(400,430,'jouer').setInteractive();

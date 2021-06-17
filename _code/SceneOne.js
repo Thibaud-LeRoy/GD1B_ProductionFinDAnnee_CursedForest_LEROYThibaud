@@ -1,4 +1,7 @@
+var anabla;
+var ceana;
 var player;
+var notJumping = true;
 var pv = 3;
 var PDV1;
 var PDV2;
@@ -71,7 +74,7 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-------------------------------------------   PERSO   -----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //this.load.image('player', 'assets/player_placeholdere.png');
+        this.load.spritesheet('player', '../_assets/_export/_eoghann/eoghann_spritesheet.png',{ frameWidth: 244, frameHeight: 300 })
         
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,6 +82,8 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         this.load.spritesheet('plante_boule', '../_assets/_export/_ennemies/spritesheet_planteBoule.png',{ frameWidth: 194, frameHeight: 220 })
         this.load.spritesheet('plante_rayon', '../_assets/_export/_ennemies/spritesheet_planteRayon.png',{ frameWidth: 209, frameHeight: 133 })
+        this.load.spritesheet('rayon_poison', '../_assets/_export/_ennemies/rayon_poison.png',{ frameWidth: 60, frameHeight: 500 });
+        this.load.image('boule_poison', '../_assets/_export/_ennemies/boule_poison.png');
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-----------------------------------------   ANIMAUX   -----------------------------------------------//
@@ -89,6 +94,11 @@ class SceneOne extends Phaser.Scene{
         this.load.spritesheet('renard', '../_assets/_export/_renard/renard_spritesheet.png',{ frameWidth: 196, frameHeight: 221 })
         this.load.spritesheet('cerf', '../_assets/_export/_cerf/cerf_spritesheet.png',{ frameWidth: 301, frameHeight: 319 })
         
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //--------------------------------------   ANABLA CEANA   ---------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this.load.spritesheet('anabla','../_assets/_export/_anabla/anabla_spritesheet.png',{ frameWidth: 192, frameHeight: 488 })
+        this.load.spritesheet('ceana','../_assets/_export/_ceana/ceana_spritesheet.png',{ frameWidth: 192, frameHeight: 488 })
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-----------------------------------------   TILESET   -----------------------------------------------//
@@ -104,6 +114,9 @@ class SceneOne extends Phaser.Scene{
 ///////////////////////////////////////////////----------------------------------------------- CREATE --------------------------------------------------/////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////---------------------------------------------------------------------------------///////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //anabla = this.add.sprite(3000,950,'anabla');
+    //ceana = this.add.sprite(2500,950,'ceana');
+    //anabla.flipX = true;
     
     create(){
         
@@ -120,11 +133,38 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-------------------------------------------   PERSOS   -----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        player = this.physics.add.sprite(150, 550, 'player').setScale(1);
+        //DROITE
+        player = this.physics.add.sprite(150, 250, 'player').setScale(0.7);
         player.setCollideWorldBounds(true);
+        this.anims.create({
+            key : 'right',
+            frames: this.anims.generateFrameNumbers('player',{start :0 , end:6}),
+            frameRate: 7,
+            repeat : -1
+        });
+        //REGARDE DROITE
+         this.anims.create({
+            key : 'look_right',
+            frames: this.anims.generateFrameNumbers('player',{start :7 , end:7}),
+            frameRate: 1,
+            repeat : -1
+        });
+        //GAUCHE
+         this.anims.create({
+            key : 'left',
+            frames: this.anims.generateFrameNumbers('player',{start :9 , end:15}),
+            frameRate: 7,
+            repeat : -1
+        });
+        //REGARDE GAUCHE
+         this.anims.create({
+            key : 'look_left',
+            frames: this.anims.generateFrameNumbers('player',{start :8 , end:8}),
+            frameRate: 1,
+            repeat : -1
+        });
         
-       
-        
+    
         
         crapaud = this.add.sprite(4200,1070,'crapaud');
         crapaud.flipX = true;
@@ -207,14 +247,15 @@ class SceneOne extends Phaser.Scene{
             space: Phaser.Input.Keyboard.KeyCodes.SPACE,
             shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
             escape : Phaser.Input.Keyboard.KeyCodes.ESC,
+            enter : Phaser.Input.Keyboard.KeyCodes.ENTER,
             A: Phaser.Input.Keyboard.KeyCodes.A,
             B: Phaser.Input.Keyboard.KeyCodes.B,
             X: Phaser.Input.Keyboard.KeyCodes.X,
             Y: Phaser.Input.Keyboard.KeyCodes.Y,
         });
         
-        un_left = this.input.keyboard.addKey(Phaser.Input.Keyboard.LEFT);
-        un_right = this.input.keyboard.addKey(Phaser.Input.Keyboard.RIGHT);
+        un_left = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        un_right = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
              
 }
         
@@ -230,6 +271,12 @@ class SceneOne extends Phaser.Scene{
         crapaud.anims.play('crapaudAnim',true);
         plante_boule.anims.play('plante_boule_anim',true);
         plante_rayon.anims.play('plante_rayon_anim',true);
+        
+        
+        
+
+        
+        
         
       if(crapaudPartition == false && keys.A.isDown && renardPartition == false && chouettePartition == false && cerfPartition ==false){
             crapaudPartition = true;
@@ -250,6 +297,8 @@ class SceneOne extends Phaser.Scene{
         }
     
     
+        
+        
         this.input.keyboard.on('keycombomatch', function (event) {
           if (crapaudPartition == true && partitionlancee == false) {
               partitionlancee = true;
@@ -281,21 +330,58 @@ class SceneOne extends Phaser.Scene{
      });
         
         
+        
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////--------------------  CONTROLES ----------------------/////////////////////////////////////////////////////////////////////////// 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+        
+        
+        // JUMP
+        if (keys.up.isDown && notJumping == true){
+            notJumping = false;
+            player.setVelocityY(-1000);
+        }
+
+        
+        if(player.body.onFloor()){
+            notJumping = true;
+        }
+        
+        // DROITE
         if (keys.right.isDown){
+            player.anims.play('right', true);
             player.setVelocityX(1000);    
         }
+        
+        // GAUCHE
         else if (keys.left.isDown){
+            player.anims.play('left', true);
             player.setVelocityX(-1000);
         }
+        
+        // REGARD A GAUCHE
+        else if (Phaser.Input.Keyboard.JustUp(un_left)){
+            player.setVelocityX(0);
+            player.anims.play('look_left',true);
+        }
+        
+        // REGARD A DROITE
+        else if (Phaser.Input.Keyboard.JustUp(un_right)){
+            player.setVelocityX(0);
+            player.anims.play('look_right',true);
+        }  
+        
+        // BLOQUE SI 2 TOUCHES APPUYEES
         else if (keys.right.isUp && keys.left.isUp){
             player.setVelocityX(0);
         }
-        if (keys.up.isDown){
-            player.setVelocityY(-1000);
-        }
+        
+        // BAS
         else if (keys.down.isDown){
             player.setVelocityY(1000);
         }
+        
+        
     }
 }
 
