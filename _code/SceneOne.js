@@ -29,7 +29,9 @@ var parallaxe;
 
 var crapaud;
 var plante_boule;
+var boule_poison;
 var plante_rayon;
+var rayon_poison;
 
 
 var crapaudPartition = false;
@@ -37,6 +39,15 @@ var renardPartition = false;
 var chouettePartition = false;
 var cerfPartition = false;
 var partitionlancee = false;
+
+
+//MUSIQUES
+var theme_musique;
+var son_courir;
+var son_crapaud;
+var son_cerf;
+var son_chouette;
+var son_renard;
 
 class SceneOne extends Phaser.Scene{
     constructor(){
@@ -82,8 +93,8 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         this.load.spritesheet('plante_boule', '../_assets/_export/_ennemies/spritesheet_planteBoule.png',{ frameWidth: 194, frameHeight: 220 })
         this.load.spritesheet('plante_rayon', '../_assets/_export/_ennemies/spritesheet_planteRayon.png',{ frameWidth: 209, frameHeight: 133 })
-        this.load.spritesheet('rayon_poison', '../_assets/_export/_ennemies/rayon_poison.png',{ frameWidth: 60, frameHeight: 500 });
-        this.load.image('boule_poison', '../_assets/_export/_ennemies/boule_poison.png');
+        this.load.spritesheet('rayonPoison', '../_assets/_export/_ennemies/rayon_poison.png',{ frameWidth: 60, frameHeight: 500 });
+        this.load.image('boulePoison', '../_assets/_export/_ennemies/boule_poison.png');
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-----------------------------------------   ANIMAUX   -----------------------------------------------//
@@ -105,6 +116,17 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         this.load.image('tuile_niveau1', '../_assets/_export/_tileset/sprite_props.png');
         this.load.tilemapTiledJSON('map_level1', '_levels/map_level1.json');
+     
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //-----------------------------------------   MUSIQUES  -----------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        this.load.audio('ambiance', '../_assets/_export/_sons/musiqueAmbiance.mp3');
+        this.load.audio('courir', '../_assets/_export/_sons/courir.mp3');
+        this.load.audio('sonCrapaud','../_assets/_export/_sons/grenouille.mp3');
+        
+       
+        
         
     }
     
@@ -120,18 +142,42 @@ class SceneOne extends Phaser.Scene{
     
     create(){
         
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //----------------------------------------   MUSIQUES     ---------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        theme_musique = this.sound.add('ambiance',{volume:0.05});
+        theme_musique.loop = true;
+        theme_musique.play();
+        
+        son_crapaud =this.sound.add('sonCrapaud',{volume:0.7});
+        son_crapaud.loop =true;
+        son_crapaud.play();
+        
+        son_courir = this.sound.add('courir',{volume:0.1});
+        
+        
+        
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //----------------------------------------   CAMERA       ---------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
         this.cameras.main.setBounds(0, 0, 4480, 1216);
         this.cameras.main.fadeIn(3000);
         this.cameras.main.zoom = 0.4;
         this.physics.world.setBounds(0, 0, 4480, 1216);
+        
+        
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //----------------------------------------   BACKGROUND   ---------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         fond = this.add.image(600, 150, 'fond').setScrollFactor(0.5);
         
+        
+        
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //-------------------------------------------   PERSOS   -----------------------------------------------//
+        //-------------------------------------------   PERSOS   ----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //DROITE
         player = this.physics.add.sprite(150, 250, 'player').setScale(0.7);
@@ -164,7 +210,7 @@ class SceneOne extends Phaser.Scene{
             repeat : -1
         });
         
-    
+        ////////////////////------------------------  CRAPAUD ------------------///////////////////////
         
         crapaud = this.add.sprite(4200,1070,'crapaud');
         crapaud.flipX = true;
@@ -195,11 +241,7 @@ class SceneOne extends Phaser.Scene{
         });
         
         
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //----------------------------------------   PARALLAXE   ----------------------------------------------//
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //parallaxe = this.add.image(5000,360,'cacheParallaxe').setScrollFactor(2);
-        //parallaxe = this.add.image(14500,360,'cacheParallaxe').setScrollFactor(2);
+
         
         ///////////////////////////////////////////////////////////
         ////////////////////////  TILED  //////////////////////////
@@ -214,19 +256,40 @@ class SceneOne extends Phaser.Scene{
         const plateforme_collide = map.createLayer('plateforme_collide',tileset,0,0);
         plateforme_collide.setCollisionByExclusion(-1,true);
         this.physics.add.collider(player,plateforme_collide);
-        
         const plateforme_traverse = map.createLayer('plateforme_traverse',tileset,0,0);
+        
+        
+        
+        
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //----------------------------------------   PHYSIQUE     ---------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        boule_poison = this.add.image(1810,130,'boulePoison');
+        //boule_poison.setCollideWorldBounds(true);
+        //boule_poison.body.setAllowGravity(true);
+        
+        /*this.tweens.add({
+            targets : boule_poison,
+                props : {
+                    //x : {value : 800, duration : 700},
+                    y : {value : 150, duration : 900},
+                },
+            yoyo : true,
+            repeat : -1
+        });*/
+        
+        
+        
+        
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //--------------------------------------------   UI   -------------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //partition = this.add.image(690,600,'partition');
         this.cameras.main.startFollow(player, true);
-        
         PV_vide = this.add.image(-500,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
         PV_vide = this.add.image(-350,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
         PV_vide = this.add.image(-200,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
-        
         PDV1 = this.add.image(-500,-200,'PV').setScrollFactor(0).setScale(1.5);
         PDV2 = this.add.image(-350,-200,'PV').setScrollFactor(0).setScale(1.5);
         PDV3 = this.add.image(-200,-200,'PV').setScrollFactor(0).setScale(1.5);
@@ -234,8 +297,6 @@ class SceneOne extends Phaser.Scene{
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //----------------------------------------   CONTROLES   ----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        
         
         
         //CLAVIER
@@ -273,10 +334,7 @@ class SceneOne extends Phaser.Scene{
         plante_rayon.anims.play('plante_rayon_anim',true);
         
         
-        
-
-        
-        
+ 
         
       if(crapaudPartition == false && keys.A.isDown && renardPartition == false && chouettePartition == false && cerfPartition ==false){
             crapaudPartition = true;
@@ -350,13 +408,19 @@ class SceneOne extends Phaser.Scene{
         // DROITE
         if (keys.right.isDown){
             player.anims.play('right', true);
-            player.setVelocityX(1000);    
+            player.setVelocityX(1000);
+            son_courir.loop = true;
+            son_courir.play();
+            son_courir.loop =false;
         }
         
         // GAUCHE
         else if (keys.left.isDown){
             player.anims.play('left', true);
             player.setVelocityX(-1000);
+            son_courir.loop = true;
+            son_courir.play();
+             son_courir.loop =false;
         }
         
         // REGARD A GAUCHE
@@ -388,4 +452,10 @@ class SceneOne extends Phaser.Scene{
 
 function attaque(x, y){
     newSwing = swing.create(player.x + x, player.y + y, 'attaque');
+}
+
+
+function boulePoison(x,y,boule_poison){
+    
+    //setTimeout(function(){boule_poison.setVelocityY(50)},2000);
 }
