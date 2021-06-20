@@ -30,7 +30,7 @@ class EcranTitre extends Phaser.Scene{
         var boutonJouer = this.add.image(400,430,'jouer').setInteractive();
         var boutonQuitter = this.add.image(400,540,'quitter').setInteractive();
           
-        this.input.setDefaultCursor('url(../assets/_export/_ecranTitre/suivi_choix.png),pointer');
+        //this.input.setDefaultCursor('url(../assets/_export/_ecranTitre/suivi_choix.png),pointer');
         
         
         

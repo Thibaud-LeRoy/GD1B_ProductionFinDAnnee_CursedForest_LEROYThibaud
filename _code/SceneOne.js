@@ -17,6 +17,52 @@ var gamepad;
 var paddle;
 var padConnected;
 var pad;
+var bouton_enter;
+var bouton_escape;
+
+//////////////////////   IMAGES TOUCHES /////////////////
+//CRAPAUD
+var crapaud1;
+var crapaud2;
+var crapaud3;
+var crapaud4;
+var crapaud5;
+//RENARD
+var renard1;
+var renard2;
+var renard3;
+var renard4;
+var renard5;
+//CHOUETTE
+var chouette1;
+var chouette2;
+var chouette3;
+var chouette4;
+var chouette5;
+//CERF
+var cerf1;
+var cerf2;
+var cerf3;
+var cerf4;
+var cerf5;
+
+
+var partitionAffiche = false;
+var partitionCrapaudAffiche = false;
+var partitionRenardAffiche = false;
+var partitionChouetteAffiche = false;
+var partitionCerfAffiche = false;
+var ecranFondPartition;
+
+var imgCerfPartition;
+var imgCrapaudPartition;
+var imgChouettePartition;
+var imgRenardPartition;
+var imgCrapaudPartitionChoix;
+var imgRenardPartitionChoix;
+var imgChouettePartitionChoix;
+var imgCerfPartitionChoix;
+
 
 
 var fond;
@@ -38,6 +84,7 @@ var crapaudPartition = false;
 var renardPartition = false;
 var chouettePartition = false;
 var cerfPartition = false;
+var accesPartition = false;
 var partitionlancee = false;
 
 
@@ -69,18 +116,35 @@ class SceneOne extends Phaser.Scene{
         //----------------------------------------   BACKGROUND   ---------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         this.load.image('fond', '../_assets/_export/_decors/_level1/fond.png');
-        /*this.load.image('second_Plan', '../_assets/_export/_decors/_level1/second_plan.png');
-        this.load.image('premier_Plan', '../_assets/_export/_decors/_level1/premier_plan.png');
-        this.load.image('water', '../_assets/_export/_decors/_level1/water.png');
-        this.load.image('cacheParallaxe', '../_assets/_export/_decors/_level1/cache_parallaxe.png');*/
-        
-        
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //--------------------------------------------   UI   -------------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //this.load.image('partition','assets/partition.png');
         this.load.image('PV','../_assets/_export/_interface/PV.png');
         this.load.image('PV_vide','../_assets/_export/_interface/PV_vide.png');
+        this.load.image('enter','../_assets/_export/_interface/enter.png');
+        this.load.image('escape','../_assets/_export/_interface/escape.png');
+        
+        this.load.image('fond_partition','../_assets/_export/_interface/fond_menu_partition.png');
+        this.load.image('cerf_partition','../_assets/_export/_interface/cerf_partition.png');
+        this.load.image('cerf_partition_choix','../_assets/_export/_interface/cerf_partition.png');
+        
+        this.load.image('crapaud_partition','../_assets/_export/_interface/crapaud_partition.png');
+        this.load.image('crapaud_partition_choix','../_assets/_export/_interface/crapaud_partition.png');
+        
+        this.load.image('chouette_partition','../_assets/_export/_interface/chouette_partition.png');
+        this.load.image('chouette_partition_choix','../_assets/_export/_interface/chouette_partition.png');
+        
+        this.load.image('renard_partition','../_assets/_export/_interface/renard_partition.png');
+        this.load.image('renard_partition_choix','../_assets/_export/_interface/renard_partition.png');
+        
+        
+        // BOUTONS PARTITIONS
+        this.load.image('B','../_assets/_export/_interface/B.png');
+        this.load.image('A','../_assets/_export/_interface/A.png');
+        this.load.image('X','../_assets/_export/_interface/X.png');
+        this.load.image('Y','../_assets/_export/_interface/Y.png');
+        
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //-------------------------------------------   PERSO   -----------------------------------------------//
@@ -180,7 +244,7 @@ class SceneOne extends Phaser.Scene{
         //-------------------------------------------   PERSOS   ----------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //DROITE
-        player = this.physics.add.sprite(150, 250, 'player').setScale(0.7);
+        player = this.physics.add.sprite(150, 250, 'player').setScale(0.5);
         player.setCollideWorldBounds(true);
         this.anims.create({
             key : 'right',
@@ -232,7 +296,7 @@ class SceneOne extends Phaser.Scene{
             repeat : -1
         });
         
-        plante_rayon = this.add.sprite(3150,600,'plante_rayon').setRotation(-80);
+        plante_rayon = this.add.sprite(3150,800,'plante_rayon').setRotation(-80);
         this.anims.create({
             key : 'plante_rayon_anim',
             frames: this.anims.generateFrameNumbers('plante_rayon',{start :0 , end:44}),
@@ -240,6 +304,24 @@ class SceneOne extends Phaser.Scene{
             repeat : -1
         });
         
+              
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //----------------------------------------   PHYSIQUE     ---------------------------------------------//
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        boule_poison = this.physics.add.image(1810,130,'boulePoison');
+        boule_poison.body.allowGravity = false;
+        boule_poison.body.moves = true;
+        
+        
+        this.tweens.add({
+            targets : boule_poison,
+                props : {
+                    //x : {value : 800, duration : 700},
+                    y : {value : 750, duration : 900},
+                },
+            yoyo : true,
+            repeat : -1
+        });
         
 
         
@@ -262,30 +344,65 @@ class SceneOne extends Phaser.Scene{
         
         
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //----------------------------------------   PHYSIQUE     ---------------------------------------------//
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        boule_poison = this.add.image(1810,130,'boulePoison');
-        //boule_poison.setCollideWorldBounds(true);
-        //boule_poison.body.setAllowGravity(true);
-        
-        /*this.tweens.add({
-            targets : boule_poison,
-                props : {
-                    //x : {value : 800, duration : 700},
-                    y : {value : 150, duration : 900},
-                },
-            yoyo : true,
-            repeat : -1
-        });*/
-        
-        
-        
-        
-        
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////
         //--------------------------------------------   UI   -------------------------------------------------//
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //partition = this.add.image(690,600,'partition');
+        
+        
+        ecranFondPartition = this.add.image(690,360,'fond_partition').setScale(2.5).setAlpha(0.8).setVisible(false).setScrollFactor(0);
+        
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //--------------------  PARTITION  --------------------//
+        
+        /////////------  CRAPAUD -------//////////////
+        imgCrapaudPartition = this.add.image(-300,200,'crapaud_partition').setScale(1.5).setVisible(false).setScrollFactor(0);
+        imgCrapaudPartitionChoix = this.add.image(400,100,'crapaud_partition_choix').setScale(1.5).setVisible(false).setScrollFactor(0);//CHOIX DE LA PARTITION
+        crapaud1 = this.add.image(200,500,'B').setScrollFactor(0).setVisible(false);
+        crapaud2 = this.add.image(300,500,'Y').setScrollFactor(0).setVisible(false);
+        crapaud3 = this.add.image(400,500,'A').setScrollFactor(0).setVisible(false);
+        crapaud4 = this.add.image(500,500,'Y').setScrollFactor(0).setVisible(false);
+        crapaud5 = this.add.image(600,500,'A').setScrollFactor(0).setVisible(false);
+       
+        
+        
+        ////////------  RENARD -------///////////////
+        imgRenardPartition = this.add.image(200,200,'renard_partition').setScale(1.5).setVisible(false).setScrollFactor(0);
+        imgRenardPartitionChoix = this.add.image(400,100,'renard_partition_choix').setScale(1.5).setVisible(false).setScrollFactor(0);//CHOIX DE LA PARTITION
+        renard1 =  this.add.image(200,500,'Y').setScrollFactor(0).setVisible(false);
+        renard2 =  this.add.image(300,500,'X').setScrollFactor(0).setVisible(false);
+        renard3 =  this.add.image(400,500,'B').setScrollFactor(0).setVisible(false);
+        renard4 =  this.add.image(500,500,'B').setScrollFactor(0).setVisible(false);
+        renard5 =  this.add.image(600,500,'X').setScrollFactor(0).setVisible(false);
+    
+        
+        ////////------  CHOUETTE -------/////////////
+        imgChouettePartition = this.add.image(700,200,'chouette_partition').setScale(1.5).setVisible(false).setScrollFactor(0);
+        imgChouettePartitionChoix = this.add.image(400,100,'chouette_partition_choix').setScale(1.5).setVisible(false).setScrollFactor(0);//CHOIX DE LA PARTITION
+        chouette1 =  this.add.image(200,500,'A').setScrollFactor(0).setVisible(false);
+        chouette2 =  this.add.image(300,500,'B').setScrollFactor(0).setVisible(false);
+        chouette3 =  this.add.image(400,500,'X').setScrollFactor(0).setVisible(false);
+        chouette4 =  this.add.image(500,500,'X').setScrollFactor(0).setVisible(false);
+        chouette5 =  this.add.image(600,500,'B').setScrollFactor(0).setVisible(false);
+        
+        ///////------  CERF -------/////////////
+        imgCerfPartition = this.add.image(1200,200,'cerf_partition').setScale(1.5).setVisible(false).setScrollFactor(0);
+        imgCerfPartitionChoix = this.add.image(400,100,'cerf_partition_choix').setScale(1.5).setVisible(false).setScrollFactor(0);//CHOIX DE LA PARTITION
+        cerf1 =  this.add.image(200,500,'X').setScrollFactor(0).setVisible(false);
+        cerf2 =  this.add.image(300,500,'Y').setScrollFactor(0).setVisible(false);
+        cerf3 =  this.add.image(400,500,'A').setScrollFactor(0).setVisible(false);
+        cerf4 =  this.add.image(500,500,'Y').setScrollFactor(0).setVisible(false);
+        cerf5 =  this.add.image(600,500,'B').setScrollFactor(0).setVisible(false);
+        
+        
+        
+        
+        bouton_enter = this.add.image(-500, 600,'enter').setScale(1.5);
+        bouton_enter.setScrollFactor(0);
+        bouton_enter.setInteractive();
+        
+        bouton_escape = this.add.image(-500, 600,'escape').setScale(1.5).setVisible(false);
+        bouton_escape.setScrollFactor(0);
+        bouton_escape.setInteractive();
+        
         this.cameras.main.startFollow(player, true);
         PV_vide = this.add.image(-500,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
         PV_vide = this.add.image(-350,-200,'PV_vide').setScrollFactor(0).setScale(1.5);
@@ -334,65 +451,96 @@ class SceneOne extends Phaser.Scene{
         plante_rayon.anims.play('plante_rayon_anim',true);
         
         
- 
         
-      if(crapaudPartition == false && keys.A.isDown && renardPartition == false && chouettePartition == false && cerfPartition ==false){
+        
+        
+        
+      if(crapaudPartition == false && keys.B.isDown && renardPartition == false && chouettePartition == false && cerfPartition ==false && accesPartition ==true){
             crapaudPartition = true;
-            this.keycombo1 = this.input.keyboard.createCombo('ABXXB');
-        }
+            this.keycombo1 = this.input.keyboard.createCombo('BYAYA'); //BBYAYA
+        }                                                       
         
-    if (renardPartition == false && keys.B.isDown && crapaudPartition == false && chouettePartition == false && cerfPartition ==false){
+    if (renardPartition == false && keys.Y.isDown && crapaudPartition == false && chouettePartition == false && cerfPartition ==false && accesPartition ==true){
             renardPartition = true;
-            this.keycombo2 = this.input.keyboard.createCombo('BYAYA');
+            this.keycombo2 = this.input.keyboard.createCombo('YXBBX'); 
         }
-    if (chouettePartition == false && keys.X.isDown && renardPartition == false && crapaudPartition == false && cerfPartition ==false){
+    if (chouettePartition == false && keys.A.isDown && renardPartition == false && crapaudPartition == false && cerfPartition ==false && accesPartition ==true){
             chouettePartition = true;
-            this.keycombo3 = this.input.keyboard.createCombo('XYAYB');
+            this.keycombo3 = this.input.keyboard.createCombo('ABXXB'); 
         }
-    if (cerfPartition == false && keys.Y.isDown && renardPartition == false && chouettePartition == false && crapaudPartition ==false){
+    if (cerfPartition == false && keys.X.isDown && renardPartition == false && chouettePartition == false && crapaudPartition ==false && accesPartition ==true){
             cerfPartition = true;
-            this.keycombo4 = this.input.keyboard.createCombo('YXBBX');
+            this.keycombo4 = this.input.keyboard.createCombo('XYAYB'); 
         }
     
     
         
         
         this.input.keyboard.on('keycombomatch', function (event) {
-          if (crapaudPartition == true && partitionlancee == false) {
+          if (crapaudPartition == true && partitionlancee == false){
               partitionlancee = true;
               console.log('crapaud !');
-              setTimeout(function(){crapaudPartition = false;},2000)
-              setTimeout(function(){partitionlancee = false; console.log('partition prete')},2000)
+              quitterPartitionCrapaud();
+              setTimeout(function(){crapaudPartition = false;},10000)
+              setTimeout(function(){partitionlancee = false; console.log('partition prete')},5000)
+              setTimeout(function(){console.log('partition_finie')},10000)
             } 
             
             else if (renardPartition == true && partitionlancee == false) {
                 partitionlancee = true;
                 console.log('renard !');
-                setTimeout(function(){renardPartition = false;},2000)
-                setTimeout(function(){partitionlancee = false;console.log('partition prete')},2000)
+                quitterPartitionRenard();
+                setTimeout(function(){renardPartition = false;},10000)
+                setTimeout(function(){partitionlancee = false;console.log('partition prete')},15000)
+                setTimeout(function(){console.log('partition_finie')},15000)
             }
             
             else if (chouettePartition == true && partitionlancee == false) {
                 partitionlancee = true;
                 console.log('chouette !');
-                setTimeout(function(){chouettePartition = false;},2000)
-                setTimeout(function(){partitionlancee = false;console.log('partition prete')},2000)
+                quitterPartitionChouette();
+                setTimeout(function(){chouettePartition = false;},10000)
+                setTimeout(function(){partitionlancee = false;console.log('partition prete')},5000)
+                setTimeout(function(){console.log('partition_finie')},5000)
             }
             
             else if (cerfPartition == true && partitionlancee == false) {
                 partitionlancee = true;
                 console.log('cerf !');
-                setTimeout(function(){cerfPartition = false;},2000)
-                setTimeout(function(){partitionlancee = false;console.log('partition prete')},2000)   
+                quitterPartitionCerf();
+                setTimeout(function(){cerfPartition = false;},10000)
+                setTimeout(function(){partitionlancee = false;console.log('partition prete')},5000)
+                setTimeout(function(){console.log('partition_finie')},5000)
             }
      });
+        
+        
+//////////////////////////////////////////////////////////////////////
+//----------------  AFFICHAGE DU MENU DES PARTITIONS ---------------//
+//////////////////////////////////////////////////////////////////////
+
+
+        if (keys.enter.isDown && partitionAffiche == false){
+            afficheMenuPartition();
+            this.physics.pause();
+        }
+        
+        
+        if (keys.escape.isDown && partitionAffiche == true){
+            quitterMenuPartition();
+            quitterPartitionCrapaud();
+            this.physics.resume();
+        }
+        
+        if (partitionlancee == true){
+            this.physics.resume();
+        } 
         
         
         
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 /////////////////////////////////////////////////////--------------------  CONTROLES ----------------------/////////////////////////////////////////////////////////////////////////// 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-        
         
         // JUMP
         if (keys.up.isDown && notJumping == true){
@@ -420,7 +568,7 @@ class SceneOne extends Phaser.Scene{
             player.setVelocityX(-1000);
             son_courir.loop = true;
             son_courir.play();
-             son_courir.loop =false;
+            son_courir.loop =false;
         }
         
         // REGARD A GAUCHE
@@ -446,16 +594,208 @@ class SceneOne extends Phaser.Scene{
         }
         
         
+        
+//////////////////////////////////////////////////////////////////////
+//------------  AFFICHAGE DE CHAQUE PARTITION DISTINCTE ------------//
+//////////////////////////////////////////////////////////////////////
+        
+        
+        if(keys.A.isDown && partitionAffiche == true && partitionCrapaudAffiche == false && partitionRenardAffiche == false && partitionChouetteAffiche == false && partitionCerfAffiche == false){
+        partitionChouetteAffiche = true;
+        quitterMenuPartition();
+        affichePartitionChouette();
+       }
+        
+        ///
+        else if(keys.B.isDown && partitionAffiche == true && partitionCrapaudAffiche == false && partitionRenardAffiche == false && partitionChouetteAffiche == false && partitionCerfAffiche == false){
+        partitionCrapaudAffiche = true;
+        quitterMenuPartition();
+        affichePartitionCrapaud();
+       }
+        ///
+        
+        else if(keys.X.isDown && partitionAffiche == true && partitionCrapaudAffiche == false && partitionRenardAffiche == false && partitionChouetteAffiche == false && partitionCerfAffiche == false){
+        partitionCerfAffiche = true;
+        quitterMenuPartition();
+        affichePartitionCerf();
+       }
+        else if(keys.Y.isDown && partitionAffiche == true && partitionCrapaudAffiche == false && partitionRenardAffiche == false && partitionChouetteAffiche == false && partitionCerfAffiche == false){
+        partitionRenardAffiche =true;
+        quitterMenuPartition();
+        affichePartitionRenard();
+       } 
     }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////----------------------------------------------------------------------------------//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////----------------------------------------------- FONCTIONS -----------------------------------------------/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////---------------------------------------------------------------------------------///////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function attaque(x, y){
-    newSwing = swing.create(player.x + x, player.y + y, 'attaque');
+
+
+
+function affichePartitionCrapaud(){
+    partitionCrapaudAffiche = true;
+    partitionAffiche =true;
+    ecranFondPartition.setVisible(true);
+    imgCrapaudPartitionChoix.setVisible(true);
+    accesPartition = true;
+    crapaud1.setVisible(true);
+    crapaud2.setVisible(true);
+    crapaud3.setVisible(true);
+    crapaud4.setVisible(true);
+    crapaud5.setVisible(true);
+    bouton_escape.setVisible(true);
+    bouton_enter.setVisible(false);
+}
+function quitterPartitionCrapaud(){
+    partitionCrapaudAffiche = false;
+    partitionAffiche =false;
+    ecranFondPartition.setVisible(false);
+    imgCrapaudPartitionChoix.setVisible(false);
+    accesPartition = false;
+    crapaud1.setVisible(false);
+    crapaud2.setVisible(false);
+    crapaud3.setVisible(false);
+    crapaud4.setVisible(false);
+    crapaud5.setVisible(false);
+    bouton_escape.setVisible(false);
+    bouton_enter.setVisible(true);
 }
 
 
-function boulePoison(x,y,boule_poison){
-    
-    //setTimeout(function(){boule_poison.setVelocityY(50)},2000);
+function affichePartitionChouette(){
+    partitionChouetteAffiche = true;
+    partitionAffiche =true;
+    ecranFondPartition.setVisible(true);
+    imgChouettePartitionChoix.setVisible(true);
+    accesPartition = true;
+    chouette1.setVisible(true);
+    chouette2.setVisible(true);
+    chouette3.setVisible(true);
+    chouette4.setVisible(true);
+    chouette5.setVisible(true);
+    bouton_escape.setVisible(true);
+    bouton_enter.setVisible(false);
+}
+function quitterPartitionChouette(){
+    partitionChouetteAffiche = false;
+    partitionAffiche =false;
+    ecranFondPartition.setVisible(false);
+    imgChouettePartitionChoix.setVisible(false);
+    accesPartition = false;
+    chouette1.setVisible(false);
+    chouette2.setVisible(false);
+    chouette3.setVisible(false);
+    chouette4.setVisible(false);
+    chouette5.setVisible(false);
+    bouton_escape.setVisible(false);
+    bouton_enter.setVisible(true);
+}
+
+
+function affichePartitionRenard(){
+    partitionRenardAffiche = true;
+    partitionAffiche =true;
+    ecranFondPartition.setVisible(true);
+    imgRenardPartitionChoix.setVisible(true);
+    accesPartition = true;
+    renard1.setVisible(true);
+    renard2.setVisible(true);
+    renard3.setVisible(true);
+    renard4.setVisible(true);
+    renard5.setVisible(true);
+    bouton_escape.setVisible(true);
+    bouton_enter.setVisible(false);
+}
+function quitterPartitionRenard(){
+    partitionRenardAffiche = false;
+    partitionAffiche =false;
+    ecranFondPartition.setVisible(false);
+    imgRenardPartitionChoix.setVisible(false);
+    accesPartition = false;
+    renard1.setVisible(false);
+    renard2.setVisible(false);
+    renard3.setVisible(false);
+    renard4.setVisible(false);
+    renard5.setVisible(false);
+    bouton_escape.setVisible(false);
+    bouton_enter.setVisible(true);
+}
+
+
+function affichePartitionCerf(){
+    partitionCerfAffiche = true;
+    partitionAffiche =true;
+    ecranFondPartition.setVisible(true);
+    imgCerfPartitionChoix.setVisible(true);
+    accesPartition = true;
+    cerf1.setVisible(true);
+    cerf2.setVisible(true);
+    cerf3.setVisible(true);
+    cerf4.setVisible(true);
+    cerf5.setVisible(true);
+    bouton_escape.setVisible(true);
+    bouton_enter.setVisible(false);
+}
+function quitterPartitionCerf(){
+    partitionCerfAffiche = false;
+    partitionAffiche =false;
+    ecranFondPartition.setVisible(false);
+    imgCerfPartitionChoix.setVisible(false);
+    accesPartition = false;
+    cerf1.setVisible(false);
+    cerf2.setVisible(false);
+    cerf3.setVisible(false);
+    cerf4.setVisible(false);
+    cerf5.setVisible(false);
+    bouton_escape.setVisible(false);
+    bouton_enter.setVisible(true);
+}
+
+function afficheMenuPartition(){
+    partitionAffiche = true;
+    ecranFondPartition.setVisible(true);
+    imgCrapaudPartition.setVisible(true);
+    imgRenardPartition.setVisible(true);
+    imgChouettePartition.setVisible(true);
+    imgCerfPartition.setVisible(true);
+    bouton_escape.setVisible(true);
+    bouton_enter.setVisible(false);
+}
+function quitterMenuPartition(){
+    partitionAffiche = false;
+    ecranFondPartition.setVisible(false);
+    imgCrapaudPartition.setVisible(false);
+    imgRenardPartition.setVisible(false);
+    imgChouettePartition.setVisible(false);
+    imgCerfPartition.setVisible(false);
+    bouton_escape.setVisible(false);
+    bouton_enter.setVisible(true);
+    imgCrapaudPartitionChoix.setVisible(false);
+    imgChouettePartitionChoix.setVisible(false);
+    imgRenardPartitionChoix.setVisible(false);
+    imgCerfPartitionChoix.setVisible(false);
+    crapaud1.setVisible(false);
+    crapaud2.setVisible(false);
+    crapaud3.setVisible(false);
+    crapaud4.setVisible(false);
+    crapaud5.setVisible(false);
+    chouette1.setVisible(false);
+    chouette2.setVisible(false);
+    chouette3.setVisible(false);
+    chouette4.setVisible(false);
+    chouette5.setVisible(false);
+    renard1.setVisible(false);
+    renard2.setVisible(false);
+    renard3.setVisible(false);
+    renard4.setVisible(false);
+    renard5.setVisible(false);
+    cerf1.setVisible(false);
+    cerf2.setVisible(false);
+    cerf3.setVisible(false);
+    cerf4.setVisible(false);
+    cerf5.setVisible(false);
 }
